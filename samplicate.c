@@ -184,6 +184,22 @@ make_recv_socket (ctx)
 	  fprintf (stderr, "socket(): %s\n", strerror (errno));
 	  break;
 	}
+#ifdef SO_REUSEPORT
+    int on = 1;
+
+      if (setsockopt(ctx->fsockfd, SOL_SOCKET, SO_REUSEADDR,
+              &on, sizeof on) < 0)
+    {
+      fprintf(stderr, "Warning: setsockopt(SO_REUSEADDR) failed: %s\n",
+          strerror (errno));
+    } 
+      if (setsockopt(ctx->fsockfd, SOL_SOCKET, SO_REUSEPORT,
+              &on, sizeof on) < 0)
+    {
+      fprintf(stderr, "Warning: setsockopt(SO_REUSEPORT) failed: %s\n",
+          strerror (errno));
+    }
+#endif
       if (setsockopt (ctx->fsockfd, SOL_SOCKET, SO_RCVBUF,
 		      (char *) &ctx->sockbuflen, sizeof ctx->sockbuflen) == -1)
 	{
